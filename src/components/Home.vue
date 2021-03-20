@@ -1,9 +1,17 @@
 <template>
     <v-container class="mx-1 my_font">
         <br/>
-        <h3 class="text-center">学生のための</h3>
-        <h3 class="text-center">学生による教員の成績表</h3>
+        <h1 class="text-center ">Cryrin</h1><br/>
+        <h4 class="text-center">学生のための</h4>
+        <h4 class="text-center">学生による教員の成績表</h4>
         <br/>
+
+
+        
+
+
+<!-- https://www.google.com/?code=FW3HULTor79kO1S4GAAn&state=12345abcde -->
+
 <!--           <v-text-field
             label="大学"
             v-model="search_object.search_university"
@@ -32,13 +40,13 @@
                     @keyup.enter="search_lecturer()"
 
                   ></v-text-field>
-                <v-card v-for="lecturer in fetched_lecturers" :key="lecturer" class="ma-2">
-                    <v-card-title>{{lecturer.lecturer}}</v-card-title>
+                <v-card v-for="lecturer in fetched_lecturers" :key="lecturer._id" class="ma-2">
+                    <v-card-title>{{lecturer.kanji_alphabet}}</v-card-title>
                       <v-card-text><v-chip
-                        v-for="(lecture,index) in lecturer.courses_name"
+                        v-for="(lecture,index) in lecturer.courses_id"
                         :key = "index"
-                        :href="'/#/course/' + lecturer.courses_id[index]"
-                      >{{lecture}}</v-chip></v-card-text>
+                        :href="'/#/course/' + lecturer._id"
+                      >{{lecture.course_names[0].text}}</v-chip></v-card-text>
 
 <!--                     <span v-for="lecture in lecturer.courses_name" :key="lecture">{{lecture}}</span><br/> -->
                 </v-card>
@@ -53,17 +61,17 @@
                     clearable
                   ></v-text-field>
                 <v-card v-for="lecture in fetched_lectures" :key="lecture._id" class="mb-2" outlined :href="'/#/course/' + lecture._id">
-                    <v-card-title>{{lecture.course_name[0]}}</v-card-title>
+                    <v-card-title>{{lecture.course_names[0].text}}</v-card-title>
                     <v-card-subtitle>
-                    <span v-for="lecturer in lecture.lecturer" :key="lecturer">{{lecturer}} </span>
+                    <span v-for="lecturer in lecture.lecturer_ids" :key="lecturer._id">{{lecturer.kanji_alphabet}} </span>
                     </v-card-subtitle>
                     <v-card-text>
                     総合評価:
                     <span v-if="Math.max(...lecture.recommendation) != 0">{{recommendation[lecture.recommendation.indexOf(Math.max(...lecture.recommendation))].text}}</span>
                     <span v-else> -- </span>
                     <br/>
-                    得点期待:<v-span v-if="Math.max(...lecture.point) != 0 && Math.max(...lecture.point)<4">{{point[lecture.point.indexOf(Math.max(...lecture.point))].text}}</v-span>
-                    <v-span v-else> -- </v-span>
+                    得点期待:<span v-if="Math.max(...lecture.point) != 0 && Math.max(...lecture.point)<4">{{point[lecture.point.indexOf(Math.max(...lecture.point))].text}}</span>
+                    <span v-else> -- </span>
                     <br/>
                     </v-card-text>
                 </v-card>

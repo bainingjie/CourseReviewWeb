@@ -7,6 +7,9 @@ export default {
   getCoursesDataQuestionary(id) {
     return Api().get("/api_course/"+id+'/questionary');
   },
+  getNote(id){
+    return Api().get("/api_note/"+id);
+  },
   postCoursesData(id,course) {
     return Api().post("/api_course/"+id,course);
     // .then(function (response) {
@@ -20,6 +23,7 @@ export default {
     })
   },
   buttonClicked(buttonData){
+    console.log(buttonData);
     return Api().post("/api_button/",buttonData);
   },
   searchByClass(search_object){
@@ -30,6 +34,15 @@ export default {
     // .then(function (response) {
     //     console.log(response);
     // })
+  },
+  // login(){
+  //   return Api().get("/api_search_by_class",{params:{
+  //       search_course_name:search_object.search_course_name,
+  //       search_university:search_object.search_university
+  //   }});
+  // },
+  postInvitation(code){
+    return Api().get("/api_invitation_code",{code:code});
   },
   searchByLecturer(search_object){
     // console.log(lecturer_name_obj);

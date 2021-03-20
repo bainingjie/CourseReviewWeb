@@ -4,110 +4,121 @@
       <v-card  elevation="2"  class="mb-3 pa-4 pb-1"   outlined >
         <div class="ma-1 mb-2"> 
           <span class="text-caption">{{course.university}}</span>
-          <h2 class="mb-1">{{course.course_name[0]}}</h2>
-
-          <div >
-          <span   v-for="lecturer in course.lecturer" :key="lecturer">{{lecturer}} </span><br/></div>
+          <h2 class="mb-1">{{name_1}}</h2>
 
           <div class="mt-3" >
-          <v-label>総合推奨度 : </v-label>
-          <span v-if="recommendation_index<5" style="font-weight: bold;">{{recommendation[recommendation_index].text}}</span>
-          <span v-else>---</span><br/>
+            <div v-if="name_others.length>0">
+              <v-label>別名:</v-label>
+              <span v-for="name in name_others" :key="name" class="mx-1">{{name}}</span>
+              <br/>
+            </div>
 
-          <v-label>単位期待 : </v-label>
-          <span v-if="credit_index<4">{{credit[credit_index].text}}</span>
-          <span v-else>---</span>
-          <br/>
+            <v-label>教員 : </v-label>
+            <span v-for="lecturer in course.lecturer_ids" :key="lecturer._id" class="mx-1">{{lecturer.kanji_alphabet}} </span><br/><br/>
 
-          <v-label>得点期待 : </v-label>
-          <span v-if="point_index<4">{{point[point_index].text}}</span>
-          <span v-else>---</span>
-          <br/>
+            <v-label>総合推奨度 : </v-label>
+            <span v-if="recommendation_index<5" style="font-weight: bold;">{{recommendation[recommendation_index].text}}</span>
+            <span v-else>---</span><br/>
 
-          <v-label>難易度 : </v-label>
-          <span v-if="difficulty_index<4">{{difficulty[difficulty_index].text}}</span>
-          <span v-else>---</span>
-          <br/>
+            <v-label>単位期待 : </v-label>
+            <span v-if="credit_index<4">{{credit[credit_index].text}}</span>
+            <span v-else>---</span>
+            <br/>
 
-          <v-label>評価方法: </v-label>
-          <span v-for="(eva,index) in evaluation" :key = "eva">
-            <span v-if="course.selected_evaluation[index]">{{eva}}</span>
-          </span>
+            <v-label>得点期待 : </v-label>
+            <span v-if="point_index<4">{{point[point_index].text}}</span>
+            <span v-else>---</span>
+            <br/>
 
+            <v-label>難易度 : </v-label>
+            <span v-if="difficulty_index<4">{{difficulty[difficulty_index].text}}</span>
+            <span v-else>---</span>
+            <br/>
+
+            <v-label>評価方法: </v-label>
+            <span v-for = "(eva,index) in course.selected_evaluation" :key="index">
+              <span v-if="eva>0">{{evaluation[index]}}</span>
+            </span>
+<!--             <span v-for="(eva,index) in evaluation" :key = "index">
+              <span v-if="course.selected_evaluation[index]>0">{{eva}}</span>
+            </span> -->
           </div>
 
           <v-card-actions class="justify-center mt-1">
             <v-btn rounded style="background-color:#2a9d8f;font-weight:600;" dark
-            :href="'/#/course/' + course._id +'/questionary'" >この教員に点数をつける</v-btn>
+            :href="'/#/course/' + course._id +'/questionary'" >この授業に点数をつける</v-btn>
           </v-card-actions>
-          <p class="text-center" style="color:#e76f51;">（最短1分で済む！）</p>
+
+          <v-card-actions class="justify-center mt-1">
+            <v-btn rounded style="background-color:#2a9d8f;font-weight:600;" dark
+            :href="'/#/selling/' + course._id " >ノートや教科書などを売る</v-btn>
+          </v-card-actions>
         </div>
       </v-card>
       <v-expansion-panels focusable v-model="panel" class="text-subtitle-1 mb-6">
         <v-expansion-panel class="mb-1" >
           <v-expansion-panel-header style="font-weight:600;background:#2a9d8f;color:white" >ここが良い！</v-expansion-panel-header>
-          <v-expansion-panel-content>
-            <v-chip-group
+          <v-expansion-panel-content class="py-2" >
+<!--             <v-chip-group
               column
               multiple
-              >
+              > -->
             <v-chip
               v-for="(f_g,index) in course.good_tags"
               :key = "index"
               style="
               background:#2a9d8f;color:white;
               font-size:13px;"
+              class="mx-1 my-1"
             >{{f_g.text}}</v-chip>
-            </v-chip-group>
+<!--             </v-chip-group> -->
           </v-expansion-panel-content>
         </v-expansion-panel>
 
         <v-expansion-panel class="mb-1">
           <v-expansion-panel-header style="font-weight:600;background:#e76f51;color:white">ここがダメ！</v-expansion-panel-header>
           <v-expansion-panel-content>
-            <v-chip-group
+<!--             <v-chip-group
               column
-              multiple>
+              multiple> -->
             <v-chip
               v-for="(f_g,index) in course.bad_tags"
               :key = "index"
               style="background:#e76f51;color:white;font-size:13px;"
+              class="mx-1 my-1"
             >{{f_g.text}}</v-chip>
-            </v-chip-group>
+<!--             </v-chip-group> -->
           </v-expansion-panel-content>
         </v-expansion-panel>
 
         <v-expansion-panel class="mb-1 ">
           <v-expansion-panel-header style="font-weight:600;background:#e76f51;color:white" >ここを気をつけよう！</v-expansion-panel-header>
           <v-expansion-panel-content>
-            <v-chip-group
+<!--             <v-chip-group
               column
-              multiple>
+              multiple> -->
             <v-chip
               v-for="(f_g,index) in course.advice_tags"
               :key = "index"
               style="background:#e76f51;color:white;font-size:12px;"
+              class="mx-1 my-1"
             >{{f_g.text}}</v-chip>
-            </v-chip-group>
+<!--             </v-chip-group> -->
           </v-expansion-panel-content>
         </v-expansion-panel>
 
         <v-expansion-panel>
-          <v-expansion-panel-header style="font-weight:600;background:#2a9d8f;color:white">どうでも良いこと</v-expansion-panel-header>
+          <v-expansion-panel-header style="font-weight:600;background:#2a9d8f;color:white">講義ノート販売</v-expansion-panel-header>
           <v-expansion-panel-content>
-            <v-chip-group
-              column
-              multiple>
-            <v-chip
-              v-for="(f_g,index) in course.others_tags"
-              :key = "index"
-              style="background:#2a9d8f;color:white;font-size:13px;"
-            >{{f_g.text}}</v-chip>
-            </v-chip-group>
+            <v-list-item two-line v-for="(note,index) in course.notes" :key = "index" :href="'/#/note/'+note._id">
+              <v-list-item-content>
+                <v-list-item-title>{{note.title}}</v-list-item-title>
+                <v-list-item-subtitle>評価</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
           </v-expansion-panel-content>
         </v-expansion-panel>
       </v-expansion-panels>
-
 
       <h3>コメント</h3>
 
@@ -136,8 +147,8 @@
         </v-card-text>
       </v-card>
       </div>
-<!--       <p>{{good_click}}</p> -->
-<!--     </v-card> -->
+
+
     </v-container>
 </template>
 
@@ -145,13 +156,12 @@
 import Methods from "../../api/method.js";
 import {credit,point,difficulty,recommendation} from "../../api/GlobalData.js";
 export default {
-  name: "Questionary",
+  name: "Course",
   data() {
     return {
+      name_1:'',
+      name_others:[],
       course: {
-        course_name:[''],
-        selected_evaluation:[0,0,0,0,0,0],
-        comment:[]
       },
       credit_index : 10,
       point_index : 10,
@@ -167,17 +177,6 @@ export default {
       credit:credit,
       panel:0,
       test:0,
-      good_field:'',
-      bad_field:'',
-      other_field:'',
-      advice_field:'',
-      departments:["前期教養学部","その他"],
-      subdepartments:["理科一類","文科一類","理科二類","文科二類","理科三類","文科三類"],
-      classes:[],
-      selected_goods:[0,1],
-      selected_bads:[0,1],
-      selected_others:[0,1],
-      selected_advices:[0,1],
       good_click:[],
       laugh_click:[]
     };
@@ -202,6 +201,19 @@ export default {
 
       /**********************************************/ 
       this.course = courses_data.data;
+      this.name_1 = this.course.course_names[0].text;
+      let temp_length = this.course.course_names.length;
+      // console.log(this.course.notes);
+      this.course.notes=this.course.notes.filter(note=>note.active==true);
+
+      if(temp_length >1){
+        this.course.course_names.slice(1,temp_length).forEach((ele)=>{
+          // console.log(ele.text);
+          this.name_others.push(ele.text);
+        });
+      }
+      // console.log(this.name_others);
+
       if(Math.max(...this.course.credit) != 0){
         this.credit_index = this.course.credit.indexOf(Math.max(...this.course.credit));
       }
@@ -235,7 +247,8 @@ export default {
     this.course.comment[index].good_count += 1;
     Methods.buttonClicked({
       id:this.course._id,
-      index:index,
+      user:this.$store.state.user_id,
+      comment_id:this.course.comment[index]._id,
       good_or_laugh:1,
       increment:1
     });
@@ -245,7 +258,8 @@ export default {
     this.course.comment[index].good_count -= 1;
     Methods.buttonClicked({
       id:this.course._id,
-      index:index,
+      user:this.$store.state.user_id,
+      comment_id:this.course.comment[index]._id,
       good_or_laugh:1,
       increment:-1
     });
@@ -255,7 +269,8 @@ export default {
     this.course.comment[index].laugh_count += 1;
     Methods.buttonClicked({
       id:this.course._id,
-      index:index,
+      user:this.$store.state.user_id,
+      comment_id:this.course.comment[index]._id,
       good_or_laugh:2,
       increment:1
     });
@@ -265,7 +280,8 @@ export default {
     this.course.comment[index].laugh_count -= 1;
     Methods.buttonClicked({
       id:this.course._id,
-      index:index,
+      user:this.$store.state.user_id,
+      comment_id:this.course.comment[index]._id,
       good_or_laugh:2,
       increment:-1
     });
