@@ -31,9 +31,9 @@ export default {
         search_course_name:search_object.search_course_name,
         search_university:search_object.search_university
     }});
-    // .then(function (response) {
-    //     console.log(response);
-    // })
+  },
+  disableInvCode(obj){
+    return Api().post("/api_disable_inv_code",obj);
   },
   // login(){
   //   return Api().get("/api_search_by_class",{params:{
@@ -41,8 +41,25 @@ export default {
   //       search_university:search_object.search_university
   //   }});
   // },
-  postInvitation(code){
-    return Api().get("/api_invitation_code",{code:code});
+  checkInvitation(obj){
+    return Api().post("/api_invitation_code",obj);
+  },
+
+  LineApiLogin(obj){
+    return Api().post("/api_line_login",obj);
+  },
+
+  createUser(obj){
+    return Api().post("/api_create_user",obj);
+  },
+  checkUser(user_id){
+    return Api().post("/api_check_user",{user:user_id});
+  },
+  getNotePassword(){
+    return Api().get("/api_note_password");
+  },
+  getCourses(){
+    return Api().get("/api_get_courses");
   },
   searchByLecturer(search_object){
     // console.log(lecturer_name_obj);

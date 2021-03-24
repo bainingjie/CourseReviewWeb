@@ -2,121 +2,89 @@
     <v-container class="mx-1 my_font">
         <br/>
         <h1 class="text-center ">Cryrin</h1><br/>
-        <h4 class="text-center">学生のための</h4>
-        <h4 class="text-center">学生による教員の成績表</h4>
+        <h4 class="text-center">東大生の</h4>
+        <h4 class="text-center">履修登録＆授業内容を</h4>
+        <h4 class="text-center">サポート</h4>
         <br/>
 
+        <h2 >1.このサイトで提供するもの</h2>
+        <v-divider></v-divider>
+        <h4>講義に関する本質情報、過去問の解説、</h4>
+        <h4>厳選された試験対策ノートなどを随時更新中</h4>
+<!--         <p>利用規約へのurl</p> -->
 
+        <br/>
+        <h2>2.現時点で提供しているもの</h2>
+        <v-divider></v-divider>
+        <h4>毎年Sセメに受講者が最も多い総合科目から厳選した講義</h4>
+        <br/>
         
-
-
-<!-- https://www.google.com/?code=FW3HULTor79kO1S4GAAn&state=12345abcde -->
-
-<!--           <v-text-field
-            label="大学"
-            v-model="search_object.search_university"
-            style = "width:150px;"
-          ></v-text-field> -->
-
-        <v-card class = "mx-0">
-            <v-tabs
-              v-model="tab"
-              align-with-title
-              background-color ="primary"
-              dark
-            >
-              <v-tabs-slider color="yellow"></v-tabs-slider>
-
-              <v-tab >教員名から検索</v-tab>
-              <v-tab >授業名から検索</v-tab>
-            </v-tabs>
-            <v-tabs-items v-model="tab" >
-              <v-tab-item class="mt-3 px-3">
-                  <v-text-field
-                    clearable
-                    label="例）煉獄/杏寿郎/煉獄杏寿郎"
-                    prepend-icon="mdi-account-search-outline"
-                    v-model="search_object.search_lecturer_name"
-                    @keyup.enter="search_lecturer()"
-
-                  ></v-text-field>
-                <v-card v-for="lecturer in fetched_lecturers" :key="lecturer._id" class="ma-2">
-                    <v-card-title>{{lecturer.kanji_alphabet}}</v-card-title>
-                      <v-card-text><v-chip
-                        v-for="(lecture,index) in lecturer.courses_id"
+        <div v-for="(course_type,type_index) in course_by_type" :key="type_index" class="my-2">
+            <v-btn class="primary" dark style="font-weight: bold;">{{types[type_index]}}</v-btn>
+            <v-card v-for="(course,course_index) in course_type" :key="course_index" class="my-2" outlined shaped elevation="3">
+                <v-card-title>{{course[0].course_name}}</v-card-title>
+                <v-card-subtitle class="mt-1 text-caption">
+                    下記の講師から一人をクリックすると、その講師による講義ページに遷移します。
+                </v-card-subtitle>
+                <v-card-text>
+                    <v-chip
+                        v-for="(unit_course,index) in course"
                         :key = "index"
-                        :href="'/#/course/' + lecturer._id"
-                      >{{lecture.course_names[0].text}}</v-chip></v-card-text>
-
-<!--                     <span v-for="lecture in lecturer.courses_name" :key="lecture">{{lecture}}</span><br/> -->
-                </v-card>
-              </v-tab-item>
-
-              <v-tab-item class="mt-3 px-3">
-                  <v-text-field
-                    label="例）鬼滅/概論/鬼滅の刃概論"
-                    prepend-icon="mdi-book-search-outline "
-                    v-model="search_object.search_course_name"
-                    @keyup.enter="search_course_name()"
-                    clearable
-                  ></v-text-field>
-                <v-card v-for="lecture in fetched_lectures" :key="lecture._id" class="mb-2" outlined :href="'/#/course/' + lecture._id">
-                    <v-card-title>{{lecture.course_names[0].text}}</v-card-title>
-                    <v-card-subtitle>
-                    <span v-for="lecturer in lecture.lecturer_ids" :key="lecturer._id">{{lecturer.kanji_alphabet}} </span>
-                    </v-card-subtitle>
-                    <v-card-text>
-                    総合評価:
-                    <span v-if="Math.max(...lecture.recommendation) != 0">{{recommendation[lecture.recommendation.indexOf(Math.max(...lecture.recommendation))].text}}</span>
-                    <span v-else> -- </span>
-                    <br/>
-                    得点期待:<span v-if="Math.max(...lecture.point) != 0 && Math.max(...lecture.point)<4">{{point[lecture.point.indexOf(Math.max(...lecture.point))].text}}</span>
-                    <span v-else> -- </span>
-                    <br/>
-                    </v-card-text>
-                </v-card>
-              </v-tab-item>
-            </v-tabs-items>
-        </v-card>
-
+                        :href="'/course/' + unit_course.id"
+                        class="mx-1"
+                      >{{unit_course.lecturer_name}}</v-chip>
+    <!--             総合評価:
+                <span v-if="Math.max(...lecture.recommendation) != 0">{{recommendation[lecture.recommendation.indexOf(Math.max(...lecture.recommendation))].text}}</span>
+                <span v-else> -- </span>
+                <br/>
+                得点期待:<span v-if="Math.max(...lecture.point) != 0 && Math.max(...lecture.point)<4">{{point[lecture.point.indexOf(Math.max(...lecture.point))].text}}</span>
+                <span v-else> -- </span>
+                <br/> -->
+                </v-card-text>
+            </v-card>
+        </div>
     </v-container>
 </template>
 
 
 <script>
 import Methods from "../../api/method.js";
-import {point,difficulty,recommendation} from "../../api/GlobalData.js";
+
 export default {
     name: 'Home',
     data: () => ({
-        search_object:{
-            search_course_name:'',
-            search_lecturer_name:'',
-            search_university:'東京大学'
-
-        },
-        fetched_lectures:[],
-        fetched_lecturers:[],
-        tab:null,
-        point:point,
-        difficulty:difficulty,
-        recommendation:recommendation
+        course_types:[],
+        course_names:[],
+        // ele: [{_id,lectuer}]
+        courses:[],
+        // [[総合Aのとある名前の授業s],[総合Aの同じ名前の講義集合]]
+        course_by_type:[[],[],[],[],[],[]],
+        types:["総合科目A","総合科目B","総合科目C","総合科目D","総合科目E","総合科目F"]
     }),
     methods:{
-        async search_lecturer(){
-            // console.log(this.lecturer_name_obj);
-            var lecturers = await Methods.searchByLecturer(this.search_object);
-            this.fetched_lecturers = lecturers.data
-            console.log(lecturers.data);
-        },
-        async search_course_name(){
-            var lectures = await Methods.searchByClass(this.search_object);
-            this.fetched_lectures = lectures.data;
-            console.log(lectures.data);
-        },
+        async getCourses(){
+            let index;
+            let response= await Methods.getCourses();
+            console.log(response.data);
+            response.data.forEach((course)=>{
+                index = this.course_names.indexOf(course.course_names[0].text);
+                if(index == -1){
+                    this.course_types.push(course.type);
+                    this.course_names.push(course.course_names[0].text);
+                    this.courses.push([{course_name:course.course_names[0].text,id:course._id,lecturer_name:course.lecturer_ids[0].kanji_alphabet}]);
+                }else{
+                    this.courses[index].push({course_name:course.course_names[0].text,id:course._id,lecturer_name:course.lecturer_ids[0].kanji_alphabet});
+                }
+            });
+            this.course_types.forEach((t,index)=>{
+                // console.log(t);
+                this.course_by_type[t].push(this.courses[index]);
+            });
+            console.log(this.course_by_type);
+        }
     },
     created() {
-      // this.getData();
+      this.getCourses();
     }
 }
 

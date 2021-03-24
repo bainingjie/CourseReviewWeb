@@ -1,9 +1,10 @@
 <template>
+
+
   <v-app>
-    <v-main>
-      <v-container>
+
       <v-app-bar
-        absolute
+        app
         color="primary"
         dark
       >
@@ -17,68 +18,67 @@
 
              <v-spacer />
 
-             <div v-if="!logged_in">
-
+             <div v-if="!$store.state.logged_in">
 
 <!-- https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=1655685733&redirect_uri=https%3A%2F%2Fgoogle.com&state=12345abcde&scope=profile%20openid&nonce=09876xyz -->
 
             <v-btn  rounded style="background-color:#2a9d8f;font-weight:600;" dark
-            :href="'https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=1655685733&redirect_uri=https%3A%2F%2Focean.mxyr.tech%2F%23%2Flogin&state=12345abcde&scope=profile%20openid&nonce=09876xyz'" class="mx-6" >ログイン</v-btn></div>
-
-             <div v-if="logged_in">
+            href= "/register" class="mx-6" >新規登録</v-btn>
             <v-btn  rounded style="background-color:#2a9d8f;font-weight:600;" dark
-            :href="'/#/account'" class="mx-6" >myアカウント</v-btn></div>
+            :href= "'https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=1655685733&redirect_uri='
+              +'https%3A%2F%2Fwww.cryrin.com%2Fredirect'
+              +'&state='+this.$store.state.login_state+'&scope=profile%20openid&nonce=09876xyz'" 
+            class="mx-6" >ログイン</v-btn>
+          </div>
+
+          <div v-if="$store.state.logged_in">
+<!--             <v-btn  rounded style="background-color:#2a9d8f;font-weight:600;" dark
+            :href="'/#/account'" class="mx-6" >ようこそ、{{$store.state.nickname}}</v-btn> -->
+            <v-btn  rounded style="background-color:#2a9d8f;font-weight:600;" dark
+             class="mx-6" v-on:click="logout">logout</v-btn>
+          </div>
 
       </v-app-bar>
-      </v-container>
-      <v-container class="mt-10">
-      <router-view></router-view>  
-      </v-container>
+
+    <v-main>
+      <router-view />
     </v-main>
   </v-app>
-  
-<!--   <v-app>
+<!-- 
+  <v-card class="overflow-hidden">
     <v-app-bar
-      app
-      color="primary"
-      dark
+      absolute
+      color="white"
+      elevate-on-scroll
+      scroll-target="#scrolling-techniques-7"
     >
-      <div class="d-flex align-center">
-        <v-img
-          alt="Vuetify Logo"
-          class="shrink mr-2"
-          contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
-          transition="scale-transition"
-          width="40"
-        />
+      <v-app-bar-nav-icon></v-app-bar-nav-icon>
 
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
-        />
-      </div>
+      <v-toolbar-title>Title</v-toolbar-title>
 
       <v-spacer></v-spacer>
 
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
-      >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
+      <v-btn icon>
+        <v-icon>mdi-magnify</v-icon>
+      </v-btn>
+
+      <v-btn icon>
+        <v-icon>mdi-heart</v-icon>
+      </v-btn>
+
+      <v-btn icon>
+        <v-icon>mdi-dots-vertical</v-icon>
       </v-btn>
     </v-app-bar>
-
-    <v-main>
-      <HelloWorld/>
-    </v-main>
-  </v-app> -->
+    <v-sheet
+      id="scrolling-techniques-7"
+      class="overflow-y-auto"
+      max-height="600"
+    >
+      <v-container style="height: 1500px;">
+      </v-container>
+    </v-sheet>
+  </v-card> -->
 </template>
 
 <script>
@@ -92,12 +92,13 @@ export default {
   },
 
   data: () => ({
-    logged_in:false,
-    user_id:''
+
   }),
-  created() {
-    this.logged_in = this.$store.state.logged_in;
-    this.user_id = this.$store.state.user_id;
-  }
+  methods: {
+    logout(){
+      this.$store.commit('logout');
+      // this.$router.push('/');
+    }
+  },
 };
 </script>

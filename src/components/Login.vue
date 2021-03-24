@@ -1,26 +1,17 @@
 <template>
-  <div>
-
-    <p v-if="redirected">redirecting....</p>
-    <v-text-field v-else v-model="invitation_code" label="招待コードを入力してください"
-    append-icon="mdi-send"   @click:append="send_invi_code"
-    >  </v-text-field>
-    <h6 v-if="!redirected">招待コードはどうやって貰える？</h6>
+  <div v-if="error">
+    <p>error:先に新規登録してください</p>
+    <v-btn href="/register">新規登録する</v-btn>
   </div>
 </template>
 
 <script>
-import axios from "axios";
 import Methods from "../../api/method.js";
-// import {credit,point,difficulty,recommendation} from "../../api/GlobalData.js";
 export default {
   name: "Login",
   data() {
     return {
-      userid:'',
-      note:{},
-      redirected:false,
-      invitation_code:''
+      error:false,
     };
   },
 
@@ -31,45 +22,29 @@ export default {
   methods: {
     async login() {
       if('code' in this.$route.query&& 'state' in this.$route.query){
-        console.log('route is complete');
-        if (this.$store.state.login_state==this.$route.query.state){
-          // todo: check login state
-        }
         this.redirected = true;
-        var params = new URLSearchParams()
-        params.append('grant_type', 'authorization_code')
-        params.append('code', this.$route.query.code)
-        params.append('redirect_uri', 'https://google.com')
-        params.append('client_id', '1655685733')
-        params.append('client_secret','bd56354f0e85e712e201068150fda07e')
+        if (this.$store.state.login_state==this.$route.query.state){
+          let response = await Methods.LineApiLogin({code:this.$route.query.code});
+          if('user_id' in response.data ){
+            let response2 = await Methods.checkUser(response.data.user_id);
+            // todo: if succeed
+            if('exists' in response2.data && response2.data.exists){
+              this.$store.commit('commit_id', response.data.user_id);
+              console.log('login succeeded,user_id:'+ response.data.user_id);
+              this.$router.push('/');
+            }else{
+              this.error=true;
+            }
 
-        const config = {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
           }
         }
 
-        axios.post("https://api.line.me/oauth2/v2.1/token", params, config)
-          .then((result) => {
-            var params = new URLSearchParams()
-            params.append('id_token', result.data.id_token)
-            params.append('client_id', '1655685733')
-
-            axios.post("https://api.line.me/oauth2/v2.1/verify",params).then((res)=>{
-              this.$store.commit('commit_id', res.data.sub);
-            })
-          })
-          .catch((err) => {
-            console.log(err);
-          })
       }else{
-        console.log('route is not complete');
+    window.location.href = 'https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=1655685733&redirect_uri='
+      +'https%3A%2F%2Fgoogle.com'
+      +'&state='+this.$store.state.login_state+'&scope=profile%20openid&nonce=09876xyz';
       }
-    },
-  async send_invi_code(){
-    let invitation = await Methods.postInvitation(this.invitation_code);
-    console.log(invitation);
-  }
+    }
   },
 };
 </script>

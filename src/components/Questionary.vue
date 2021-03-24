@@ -1,9 +1,8 @@
 <template>
   <form>
     <v-container class="mx-0 pa-2" fluid>
-        <h2 class="mb-1">{{course.course_name[0]}}</h2>
-        <span   v-for="lecturer in course.lecturer" :key="lecturer">{{lecturer}} </span><br/>
-<!--     <span>科目群：検索用 (種類：語学  共通(一般教養)  専門科目  ゼミ/演習  そのほか)</span> -->
+        <h2 class="mb-1">{{course.course_names[0].text}}</h2>
+        <span   v-for="lecturer in course.lecturer_ids" :key="lecturer.kanji_alphabet">{{lecturer.kanji_alphabet}} </span><br/>
       <br/>
       <v-card elevation="4"  class="mb-4 pa-2 pb-1"  outlined>
       <h3 class="">
@@ -12,56 +11,65 @@
       <h2 class="caption grey--text">(1問目/6問)</h2>
       <br/>
       <!-- <v-container> -->
-        <v-row >
-          <v-col cols="6" md = "3" class="py-0" >
-            <v-select
+
+<!--             <v-select
               v-model = "course.credit"
               :items="credit"
               filled
               label="単位期待"
-            ></v-select>
-          </v-col>
-          <v-col cols="6" md = "3"  class="py-0">
+            ></v-select> -->
             <v-select
-              v-model = "course.point"
-              :items="point"
-              filled
-              label="得点期待"
+              v-model="know_grade"
+              :items="know_grade_texts"
             ></v-select>
-          </v-col>
-<!--           <v-col cols="6" md = "4" class="py-0">
-            <v-select
-              v-model = "course.quality"
-              :items="quality"
-              filled
-              label="充実さ"
-            ></v-select>
-          </v-col> -->
-          <v-col cols="6" md = "3"  class="py-0">
-            <v-select
-              v-model = "course.difficulty"
-              :items="difficulty"
-              filled
-              label="講義の難易度"
-            ></v-select>
-          </v-col>
-<!--           <v-col cols="6" md = "4" class="py-0">
-            <v-select
-              v-model = "course.professor_score"
-              :items="professor_score_items"
-              filled
-              label="教員を評価"
-            ></v-select>
-          </v-col> -->
-          <v-col cols="6" md = "3" class="py-0">
-            <v-select
-              v-model = "course.recommendation"
-              :items="recommendation"
-              filled
-              label="講義の総合評価"
-            ></v-select>
-          </v-col>
-        </v-row>
+
+            <v-label v-if="know_grade">単位期待:</v-label>
+
+            <span class="mx-2" v-if="know_grade">{{credit[course.credit-1]}}</span>
+            <v-rating v-if="know_grade"
+              v-model="course.credit"
+              background-color="orange lighten-3"
+              color="orange"
+              length="4"
+              size="16"
+              class="my-0"
+            ></v-rating>
+
+            <v-label v-if="know_grade">得点期待:</v-label>
+            <span class="mx-2" v-if="know_grade">{{point[course.point-1]}}</span>
+            <v-rating
+              v-model="course.point"
+              background-color="orange lighten-3"
+              color="orange"
+              length="4"
+              size="16"
+              class="mb-0"
+              v-if="know_grade"
+            ></v-rating>
+
+
+            <v-label>講義の難易度:</v-label>
+            <span class="mx-2">{{difficulty[course.difficulty-1]}}</span>
+            <v-rating
+              v-model="course.difficulty"
+              background-color="orange lighten-3"
+              color="orange"
+              length="4"
+              size="16"
+              class="mb-0"
+            ></v-rating>
+
+
+            <v-label>講義の総合評価:</v-label>
+            <span class="mx-2">{{recommendation[course.recommendation-1]}}</span>
+            <v-rating
+              v-model="course.recommendation"
+              background-color="orange lighten-3"
+              color="orange"
+              length="4"
+              size="16"
+              class="mb-0"
+            ></v-rating>
       <!-- </v-container> -->
     </v-card>
     <v-card elevation="4"  class="mb-4 pa-2 pb-1"  outlined>
@@ -120,7 +128,6 @@
         hide-details="auto"
         append-icon="mdi-plus-circle"
         @click:append="add_good"
-        @keydown.enter = "add_good()"
         v-model="good_field"
         counter
         maxlength="23"
@@ -156,7 +163,6 @@
         hide-details="auto"
         append-icon="mdi-plus-circle"
         @click:append="add_bad"
-        @keydown.enter = "add_bad()"
         v-model="bad_field"
         counter
         maxlength="23"
@@ -175,14 +181,15 @@
       <div class="mt-3" >
       <span class="red--text" style="font-size: 13px">---------- step1. 押して選択する ---------  </span>
       </div>
+
       <v-chip-group
         v-model="selected_advices"
         column
         multiple>
       <v-chip
-        v-for="f_a in fetched_advices"
+        v-for="(f_a,index) in fetched_advices"
         filter
-        :key = "f_a.text"
+        :key = "index"
         outlined
       >{{f_a.text}}</v-chip>
       </v-chip-group>
@@ -194,7 +201,6 @@
         hide-details="auto"
         append-icon="mdi-plus-circle"
         @click:append="add_advice"
-        @keydown.enter = "add_advice()"
         v-model="advice_field"
         counter
         maxlength="23"
@@ -204,65 +210,29 @@
       <p v-if="advice_field !=''" style="color:red;font-size: 13px"> 注意: 追加ボタンかenterを押して追加する</p>
       <br/>
     </v-card>
-    <v-card elevation="4"  class="mb-4 pa-2 pb-1"   outlined>
-      <h3 class="">
-        6.どうでも良いこと 
-      </h3>
-      <h2 class="caption grey--text">(6問目/{{question_count}}問)</h2>
-      <span class="red--text" style="font-size: 13px">---------- step1. 押して選択する ---------  </span>
-      <v-chip-group
-        v-model="selected_others"
-        column
-        multiple>
-      <v-chip
-        v-for="f_o in fetched_others"
-        filter
-        :key = "f_o.text"
-        outlined
-      >{{f_o.text}}</v-chip>
-      </v-chip-group>
-      <div class="mt-6" >
-      <span class="red--text" style="font-size: 13px">---------- step2. 新しいタグを書き込む ---------  </span>
-      </div>
-      <v-text-field
-        label="どうでも良い点タグを追加"
-        hide-details="auto"
-        append-icon="mdi-plus-circle"
-        @click:append="add_other"
-        @keydown.enter = "add_other()"
-        v-model="other_field"
-        counter
-        maxlength="23"
-        >
-      </v-text-field> 
-      <p v-if="other_field !=''" style="color:red;"> 注意: 追加ボタンかenterを押して追加する</p>
-      <br/>
-    </v-card>
+
+    <!-- <p>this.fetched_advices[this.selected_advices[i]].text</p> -->
     <v-card elevation="4"  class="mb-4 pa-2 pb-1"    outlined>
       <h3>コメント(任意)</h3>
+        <v-text-field
+          v-model="course.comment.title"
+          filled
+          placeholder="タイトル"
+          auto-grow
+          counter
+          maxlength="20"
+        ></v-text-field>     
         <v-textarea
-          v-model="course.comment"
+          v-model="course.comment.text"
           filled
           placeholder="アドバイス、面白いエピソード、内容の振り返り、武勇伝..."
           auto-grow
-          value=""
           counter
           maxlength="1000"
         ></v-textarea>
       <br/>
     </v-card>
-    <v-card elevation="4"  class="mb-4 pa-2 pb-1"    outlined>
-      <h3>管理人への一言（任意）</h3>
-      <v-textarea
-        v-model="course.message_to_me"
-        filled
-        placeholder="教員名が違う、講義名が検索しにくい、恋愛相談..."
-        auto-grow
-        value=""
-        counter
-        maxlength="1000"
-      ></v-textarea>
-    </v-card>
+
       <v-card-actions class="justify-center">
 
         <v-btn @click="handleSubmit" color="primary"> submit </v-btn>
@@ -285,35 +255,36 @@ export default {
       fetched_document:[],
       course: {
                 university:'',
-                course_name:'',
+                course_names:[{text:''}],
                 lecturer:[],
-                user:'haku',
+                user:'',
 
                 selected_evaluation:[],
-
-                credit:-1,
-                point:-1,
+                credit:1,
+                point:1,
                 // quality:-1,
-                difficulty:-1,
-                recommendation:-1
+                difficulty:1,
+                recommendation:1,
+                comment:{title:'',text:''},
+                message_to_me:'review submitted',
+                selected_good_texts:[],
+                selected_bad_texts:[],
+                selected_advice_texts:[],
                 // professor_score:-1,
       },
+      know_grade:1,
+      know_grade_texts:[{text:"成績は既に出てる",value:1},{text:"成績はまだ出てない",value:0}],
       error:false,
       fetched_goods:[{text:"イケボ"},{text:"フィードバックが丁寧",count:0},{text:"睡眠や内職を咎めない",count:0},{text:"質問に対して丁寧",count:0}],
       fetched_bads:[{text:"時間管理がガバガバ",count:0},{text:"やる気がない",count:0},{text:"小テスト難しい",count:0}],
-      fetched_others:[{text:"学生のモチベの低さに理解がある",count:0},{text:"名大出身とかなんとか",count:0},{text:"長男が誕生した",count:0},{text:"ガラケー",count:0},{text:"初恋の人に似てる",count:0}],
       fetched_advices:[{text:"周囲と協力して戦え",count:0},{text:"授業は出た方がいい、後で気づいた",count:0}],
       test:0,
       good_field:'',
       bad_field:'',
       other_field:'',
       advice_field:'',
-      // departments:["前期教養学部","その他"],
-      // subdepartments:["理科一類","文科一類","理科二類","文科二類","理科三類","文科三類"],
-      // classes:[],
       selected_goods:[],
       selected_bads:[],
-      selected_others:[],
       selected_advices:[],
       credit:credit,
       point:point,
@@ -325,9 +296,7 @@ export default {
 
 
   created() {
-
     this.getData();
-
     /* fill 40 classes*/ 
     // var class_start = 1;
     // var class_end = 40;
@@ -354,9 +323,14 @@ export default {
       });
 
       this.course = courses_data.data;
+
+      this.course.credit = 2;
+      this.course.difficulty =2;
+      this.course.recommendation = 2;
+      this.course.point = 2;
       // console.log(this.course.selected_evaluation);
       var temp_eval = [];
-      for (let i = 0; i < 6; i++){
+      for (let i = 0; i < 7; i++){
         if(courses_data.data.selected_evaluation[i] != 0){
           temp_eval.push(i);
         }
@@ -388,23 +362,15 @@ export default {
       }
       this.fetched_advices=this.course.advice_tags;
 
-      for(let i =0; i<this.fetched_others.length; i++){
-        let index = this.course.others_tags.findIndex((ele)=>ele.text == this.fetched_others[i].text);
-        if(index == -1){
-          this.course.others_tags.push(this.fetched_others[i]);
-        }
-      }
-      this.fetched_others=this.course.others_tags;
 
       // console.log(this.course.advice_tags);
       // console.log(this.course.selected_evaluation);
 
       this.course.selected_good_texts=[];
       this.course.selected_bad_texts=[];
-      this.course.selected_others_texts=[];
       this.course.selected_advice_texts=[];
-      this.course.comment='';
-      this.course.user='';
+      this.course.comment={title:'',text:''};
+      this.course.user=this.$store.state.user_id;
       // scorer:{department:'前期教養学部',subdepartment:'',class:'',year:1},
       this.course.message_to_me='';
     },
@@ -423,13 +389,6 @@ export default {
         this.selected_bads.push(this.fetched_bads.length-1);
       }
     },
-    add_other:function(){
-      if(this.other_field!=''){
-        this.fetched_others.push({text:this.other_field});
-        this.other_field='';
-        this.selected_others.push(this.fetched_others.length-1);
-      }
-    },
     add_advice:function(){
       if(this.advice_field!=''){
         this.fetched_advices.push({text:this.advice_field});
@@ -446,17 +405,25 @@ export default {
         // 最后只留下新加的text
         this.course.selected_bad_texts.push(this.fetched_bads[this.selected_bads[i]].text);
       }
-      for (let i =0;i<this.selected_others.length;i++){
-        // 最后只留下新加的text
-        this.course.selected_others_texts.push(this.fetched_others[this.selected_others[i]].text);
-      }
+
       for (let i =0;i<this.selected_advices.length;i++){
         // 最后只留下新加的text
         this.course.selected_advice_texts.push(this.fetched_advices[this.selected_advices[i]].text);
       }
       // console.log(this.course)
-      let result = await Methods.postCoursesData(this.$route.params.id,this.course);
-      console.log(result);
+      if(!this.know_grade){
+        this.course.credit = 4;
+        this.course.point = 4;
+      }else{
+        this.course.credit -= 1;
+        this.course.point -= 1;
+      }
+        this.course.recommendation -= 1;
+        this.course.difficulty -= 1;
+
+      // console.log(this.course);
+      await Methods.postCoursesData(this.$route.params.id,this.course);
+      // console.log(result);
       this.$router.push('/course/'+this.$route.params.id);
     }
 

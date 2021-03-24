@@ -1,51 +1,73 @@
 <template>
-  <div>
-   <v-label>タイトル:</v-label>
-   <span class="mx-2">{{note.title}}</span><br/>
-   <v-label>値段:</v-label>
-   <span class="mx-2">¥ {{note.price}}</span><br/>
-   <v-label>詳細:</v-label>
-   <span class="mx-2">{{note.description}}</span><br/>
-   <p>preview:</p>
-   <p>----images----</p>
-   <p>reviews:</p>
-   <p>----reviews----</p>
-   <v-btn color="primary">購入</v-btn>
-  </div>
+
+
+    <!-- <vue-friendly-iframe :src="url" class="responsive-iframe" ></vue-friendly-iframe> -->
+    <v-container   class="container" >
+        <iframe  id="iframe_id" :src="url" class="responsive-iframe"></iframe>
+    </v-container>
+    
+<!--      <embed src="../assets/test.pdf" ></embed> -->
+
+     <!-- <iframe id="fraDisabled" width="528" height="473" src="../../backend/pdfs/test.pdf" ></iframe> -->
+<!-- :onload="disableContextMenu()" :onMyLoad="disableContextMenu()" -->
+
+    <!-- :onload="preventRightClick()"> -->
+
+<!--     <iframe :src="url"  width="560"
+        height="315" ></iframe> -->
+<!--   <vue-iframe
+    :src="url" 
+    @load="onLoad"
+    allow="camera *; geolocation *; microphone *; autoplay *"
+    frame-id="my-ifram"
+    name="my-frame"
+    width="150px"
+    height="200px"
+  /> -->
+
+
+
 </template>
 
 <script>
 import Methods from "../../api/method.js";
-// import {credit,point,difficulty,recommendation} from "../../api/GlobalData.js";
 export default {
   name: "Note",
-  data() {
+  data () {
     return {
-      userid:'',
-      note:{}
-    };
+      url: '',
+    }
   },
-
-
-  created() {
-    this.getData();
-  },
-
-  methods: {
+  methods:{
     async getData() {
-      let note_data = await Methods.getNote(this.$route.params.id);
-      this.note = note_data.data;
-      // console.log(courses_data.data);
-      // let max_scorer = Math.max(...courses_data.data.selected_evaluation);
+      let response = await Methods.getNote(this.$route.params.id);
+      this.url= response.data.url+"#toolbar=0";
     },
-
   },
-};
-</script>
-
-<style scoped>
-.v-select{
-  font-size: 13px;
+  created(){
+        this.getData();
+  },
 }
-
+</script>
+<style scoped>
+.container {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  padding-top: 75%;
+}
+.responsive-iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+}
+@media print {
+.noPrint {
+    display:none;
+  }
+}
 </style>
